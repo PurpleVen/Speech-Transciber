@@ -1,0 +1,66 @@
+{% block content %}
+    <h1>Speech-to-Text Result</h1>
+    <button id="startButton" onclick="startSpeechRecognition()">Start Recording</button>
+    <button id="stopButton" onclick="stopSpeechRecognition()">Stop Recording</button>
+    <div id="recordingUI"></div>
+    <div id="resultContainer">
+        <div id="resultBox"></div>
+    </div>
+    <script>
+        let recognition;
+
+        function startSpeechRecognition() {
+            recognition = new webkitSpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.onstart = function() {
+                document.getElementById("startButton").disabled = true;
+                document.getElementById("stopButton").disabled = false;
+                document.getElementById("recordingUI").innerHTML = "Recording...";
+            };
+            recognition.onresult = function(event) {
+                let finalResult = "";
+                let interimResult = "";
+                for (let i = 0; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        finalResult += event.results[i][0].transcript;
+                    } else {
+                        interimResult += event.results[i][0].transcript;
+                    }
+                }
+                document.getElementById("resultBox").innerHTML = finalResult;
+            };
+            recognition.start();
+        }
+
+        function stopSpeechRecognition() {
+            recognition.stop();
+            document.getElementById("startButton").disabled = false;
+            document.getElementById("stopButton").disabled = true;
+            document.getElementById("recordingUI").innerHTML = "";
+        }
+    </script>
+    <style>
+        #resultContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            margin-top: 20px;
+        }
+        #resultBox {
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            width: 80%;
+            max-height: 100%;
+            overflow: auto;
+        }
+        #recordingUI {
+            font-size: 30px;
+            color: red;
+            margin-top: 20px;
+        }
+    </style>
+{% endblock %}
